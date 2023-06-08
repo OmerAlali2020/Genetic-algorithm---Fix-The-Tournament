@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 
-def create_item():
+def create_item(size):
     """
     Create an array of size 32, randomly place numbers from 1 to 32, and divide it into 8 sub-arrays of size 4.
 
@@ -20,9 +20,9 @@ def create_item():
                [20, 21, 27, 24],
                [14,  1,  4, 29]])
     """
-    numbers = np.arange(1, 33)
+    numbers = np.arange(1, size + 1)
     np.random.shuffle(numbers)
-    subarrays = numbers.reshape((8, 4))
+    subarrays = numbers.reshape((8, size // 8))
     return subarrays
 
 
@@ -49,7 +49,6 @@ def generate_zero_or_one(p):
 
 
 def create_condorcet_knockout_decision_matrix(size, p):
-
     matrix = np.zeros((size, size), dtype=int)
     np.fill_diagonal(matrix, -1)
 
@@ -123,7 +122,6 @@ def is_element_in_array(element, array):
 
 
 def fitness_with_prints(item, k_d_matrix, k, knockout_match):
-
     fitness_score = 1
 
     # Group stage
@@ -416,16 +414,17 @@ def partially_Matched_Crossover(parent1, parent2):
             while child2[i] in mapping2:
                 child2[i] = mapping2[child2[i]]
 
-    child1 = np.reshape(child1, (8, 4))
-    child2 = np.reshape(child2, (8, 4))
+    child1 = np.reshape(child1, (8, n // 8))
+    child2 = np.reshape(child2, (8, n // 8))
 
     return child1, child2
 
 
 def scramble_mutation(individual, mutation_rate):
-    individual = parent1 = union_subarrays(individual)
+    individual = union_subarrays(individual)
+    n = len(individual)
 
-    for i in range(len(individual)):
+    for i in range(n):
 
         if random.random() < mutation_rate:
 
@@ -441,13 +440,12 @@ def scramble_mutation(individual, mutation_rate):
 
             individual[pos1], individual[pos2] = individual[pos2], individual[pos1]
 
-    individual = np.reshape(individual, (8, 4))
+    individual = np.reshape(individual, (8, n // 8))
 
     return individual
 
 
 def roulette_wheel_selection(population, fitness):
-
     # Computes the totallity of the population fitness
     population_fitness = sum(fitness)
 
@@ -465,7 +463,7 @@ def roulette_wheel_selection(population, fitness):
     return population[choice]
 
 
-def create_population(size):
+def create_population(size, item_size):
     """
     Creates a population of individuals.
 
@@ -485,7 +483,7 @@ def create_population(size):
     population = []
 
     for _ in range(size):
-        population.append(create_item())
+        population.append(create_item(item_size))
 
     return population
 
@@ -513,7 +511,7 @@ def evaluate_population_fitness(population, k_d_matrix, k, knockout_match):
     return fitness_array
 
 
-def genetic_algorithm(population_size, k_d_matrix, number_of_generations, mutation_rate,
+def genetic_algorithm(population_size, item_size, k_d_matrix, number_of_generations, mutation_rate,
                       knockout_match_array, selected_individual):
     """
         Executes a genetic algorithm to find the best individual in a population.
@@ -536,7 +534,7 @@ def genetic_algorithm(population_size, k_d_matrix, number_of_generations, mutati
 
     # Initialize the population
 
-    population = create_population(population_size)
+    population = create_population(population_size, item_size)
     population_fitness = evaluate_population_fitness(population, k_d_matrix, selected_individual, knockout_match_array)
 
     # Do until the selected individual has won the tournament or until the maximum amount of generations
@@ -544,7 +542,6 @@ def genetic_algorithm(population_size, k_d_matrix, number_of_generations, mutati
     for i in range(number_of_generations):
 
         if max(population_fitness) == 6:
-
             # The individual we want won the tournament
 
             best_score = max(population_fitness)
@@ -558,7 +555,6 @@ def genetic_algorithm(population_size, k_d_matrix, number_of_generations, mutati
         # Creating a new population
 
         for j in range(population_size):
-
             # Selection
 
             parent1 = roulette_wheel_selection(population, population_fitness)
@@ -574,7 +570,8 @@ def genetic_algorithm(population_size, k_d_matrix, number_of_generations, mutati
             new_population.append(offspring)
 
         population = new_population
-        population_fitness = evaluate_population_fitness(population, k_d_matrix, selected_individual, knockout_match_array)
+        population_fitness = evaluate_population_fitness(population, k_d_matrix, selected_individual,
+                                                         knockout_match_array)
 
     best_score = max(population_fitness)
     best_individual_index = population_fitness.index(best_score)
@@ -586,24 +583,26 @@ def genetic_algorithm(population_size, k_d_matrix, number_of_generations, mutati
 knockout_match = [[(0, 1), (0, 2)], [(0, 3), (0, 4)], [(0, 5), (0, 6)], [(0, 7), (0, 8)],
                   [(1, 1), (1, 2)], [(1, 3), (1, 4)], [(1, 5), (1, 6)], [(1, 7), (1, 8)]]
 
-probabilities = [0.4, 0.2, 0.1, 0.05, 0.01]
+knockout_world_cup = [[(0, 1), (1, 2)], [(0, 3), (1, 4)], [(0, 5), (1, 6)], [(0, 7), (1, 8)],
+                      [(0, 2), (1, 1)], [(0, 4), (1, 3)], [(0, 6), (1, 5)], [(0, 8), (1, 7)]]
 
-# 0.005014598511382473, 0.004468497543232086
+probabilities = [0.01]
+teams = [1]
 
-for prob in probabilities:
+for t in teams:
 
-    scores = []
-    times = 100
+    print("T:" + str(t))
 
-    for i in range(times):
+    for prob in probabilities:
 
-        m = create_condorcet_knockout_decision_matrix(32, prob)
+        scores = []
+        times = 100
 
-        a = genetic_algorithm(500, m, 300, 0.05, knockout_match, 1)
+        for i in range(times):
+            m = create_condorcet_knockout_decision_matrix(128, prob)
 
-        scores.append(a[1])
+            a = genetic_algorithm(500, 128, m, 500, 0.1, knockout_match, t)
 
-    print(scores.count(6)/times)
+            scores.append(a[1])
 
-
-
+        print(scores.count(6) / times)
