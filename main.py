@@ -653,6 +653,22 @@ def genetic_algorithm(population_size, item_size, k_d_matrix, number_of_generati
     return best_individual, best_score
 
 
+def create_fifa_probability_matrix(ranking_array):
+
+    size = len(ranking_array)
+    matrix = np.full((size, size), 0.0)
+    np.fill_diagonal(matrix, -1)
+
+    for i in range(size):
+        for j in range(size):
+
+            if i < j:
+
+                matrix[i][j] = 0.5
+
+    return matrix.tolist()
+
+
 knockout_match = [[(0, 1), (0, 2)], [(0, 3), (0, 4)], [(0, 5), (0, 6)], [(0, 7), (0, 8)],
                   [(1, 1), (1, 2)], [(1, 3), (1, 4)], [(1, 5), (1, 6)], [(1, 7), (1, 8)]]
 
@@ -688,3 +704,7 @@ for t in teams:
 """
 
 
+m = create_fifa_probability_matrix(fifa_ranking)
+t = create_fifa_knockout_decision_matrix(32, m)
+
+print_matrix(t)
