@@ -120,6 +120,27 @@ def create_condorcet_knockout_decision_matrix(size, p):
     return matrix.tolist()
 
 
+def create_fifa_knockout_decision_matrix(size, p_matrix):
+
+    matrix = np.zeros((size, size), dtype=int)
+    np.fill_diagonal(matrix, -1)
+
+    for i in range(size):
+        for j in range(size):
+
+            if i < j:
+
+                # index in the upper third of the matrix
+
+                win = generate_zero_or_one(p_matrix[i][j])
+                matrix[i][j] = win
+
+                if win == 0:
+                    matrix[j][i] = 1
+
+    return matrix.tolist()
+
+
 def print_matrix(matrix):
     """
     Print a matrix in a nicely formatted manner.
@@ -638,9 +659,12 @@ knockout_match = [[(0, 1), (0, 2)], [(0, 3), (0, 4)], [(0, 5), (0, 6)], [(0, 7),
 knockout_world_cup = [[(0, 1), (1, 2)], [(0, 3), (1, 4)], [(0, 5), (1, 6)], [(0, 7), (1, 8)],
                       [(0, 2), (1, 1)], [(0, 4), (1, 3)], [(0, 6), (1, 5)], [(0, 8), (1, 7)]]
 
+fifa_ranking = [51, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 20, 21, 23, 24,
+                25, 26, 29, 35, 37, 38, 46, 49, 60, 18, 31, 42]
+
 probabilities = [0.2]
 teams = [1]
-
+"""
 
 for t in teams:
 
@@ -660,5 +684,7 @@ for t in teams:
 
         print(scores.count(6) / times)
         
+
+"""
 
 
