@@ -26,7 +26,58 @@ def create_item(size):
     return subarrays
 
 
+def create_item_by_tiers():
+    """
+    Create an array of size 32, randomly place numbers from 1 to 32, and divide it into 8 sub-arrays of size 4.
+
+    Returns:
+        numpy.ndarray: An array of size 32 divided into 8 sub-arrays of size 4.
+
+    Example:
+        >>> create_subarrays()
+        array([[12,  5,  7, 10],
+               [22, 16,  2, 11],
+               [31, 19,  8, 30],
+               [13, 25, 17, 23],
+               [32, 15,  3,  9],
+               [26, 28,  6, 18],
+               [20, 21, 27, 24],
+               [14,  1,  4, 29]])
+    """
+
+    groups = 8
+    tiers = 4
+    item = []
+
+    tier_1 = np.arange(1, 9)
+    tier_2 = np.arange(9, 17)
+    tier_3 = np.arange(17, 25)
+    tier_4 = np.arange(25, 33)
+
+    for i in range(groups):
+
+        group = []
+
+        team_1 = random.choice(tier_1)
+        tier_1 = np.delete(tier_1, np.argwhere(tier_1 == team_1))
+        group.append(team_1)
+        team_2 = random.choice(tier_2)
+        tier_2 = np.delete(tier_2, np.argwhere(tier_2 == team_2))
+        group.append(team_2)
+        team_3 = random.choice(tier_3)
+        tier_3 = np.delete(tier_3, np.argwhere(tier_3 == team_3))
+        group.append(team_3)
+        team_4 = random.choice(tier_4)
+        tier_4 = np.delete(tier_4, np.argwhere(tier_4 == team_4))
+        group.append(team_4)
+
+        item.append(group)
+
+    return item
+
+
 def create_knockout_decision_matrix(size) -> list:
+
     matrix = np.random.randint(2, size=(size, size))
     np.fill_diagonal(matrix, -1)
 
@@ -49,6 +100,7 @@ def generate_zero_or_one(p):
 
 
 def create_condorcet_knockout_decision_matrix(size, p):
+
     matrix = np.zeros((size, size), dtype=int)
     np.fill_diagonal(matrix, -1)
 
@@ -586,8 +638,9 @@ knockout_match = [[(0, 1), (0, 2)], [(0, 3), (0, 4)], [(0, 5), (0, 6)], [(0, 7),
 knockout_world_cup = [[(0, 1), (1, 2)], [(0, 3), (1, 4)], [(0, 5), (1, 6)], [(0, 7), (1, 8)],
                       [(0, 2), (1, 1)], [(0, 4), (1, 3)], [(0, 6), (1, 5)], [(0, 8), (1, 7)]]
 
-probabilities = [0.01]
+probabilities = [0.2]
 teams = [1]
+
 
 for t in teams:
 
@@ -599,10 +652,13 @@ for t in teams:
         times = 100
 
         for i in range(times):
-            m = create_condorcet_knockout_decision_matrix(128, prob)
+            m = create_condorcet_knockout_decision_matrix(32, prob)
 
-            a = genetic_algorithm(500, 128, m, 500, 0.1, knockout_match, t)
+            a = genetic_algorithm(300, 32, m, 10, 0.01, knockout_match, t)
 
             scores.append(a[1])
 
         print(scores.count(6) / times)
+        
+
+
