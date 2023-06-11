@@ -55,7 +55,6 @@ def create_item_by_tiers():
     tier_4 = np.arange(25, 33)
 
     for i in range(groups):
-
         group = []
 
         team_1 = random.choice(tier_1)
@@ -77,7 +76,6 @@ def create_item_by_tiers():
 
 
 def create_knockout_decision_matrix(size) -> list:
-
     matrix = np.random.randint(2, size=(size, size))
     np.fill_diagonal(matrix, -1)
 
@@ -100,7 +98,6 @@ def generate_zero_or_one(p):
 
 
 def create_condorcet_knockout_decision_matrix(size, p):
-
     matrix = np.zeros((size, size), dtype=int)
     np.fill_diagonal(matrix, -1)
 
@@ -121,7 +118,6 @@ def create_condorcet_knockout_decision_matrix(size, p):
 
 
 def create_fifa_knockout_decision_matrix(size, p_matrix):
-
     matrix = np.zeros((size, size), dtype=int)
     np.fill_diagonal(matrix, -1)
 
@@ -654,7 +650,6 @@ def genetic_algorithm(population_size, item_size, k_d_matrix, number_of_generati
 
 
 def create_fifa_probability_matrix(ranking_array):
-
     size = len(ranking_array)
     matrix = np.full((size, size), 0.0)
     np.fill_diagonal(matrix, -1)
@@ -663,7 +658,6 @@ def create_fifa_probability_matrix(ranking_array):
         for j in range(size):
 
             if i < j:
-
                 matrix[i][j] = 0.5
 
     return matrix.tolist()
@@ -677,6 +671,11 @@ knockout_world_cup = [[(0, 1), (1, 2)], [(0, 3), (1, 4)], [(0, 5), (1, 6)], [(0,
 
 fifa_ranking = [51, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 20, 21, 23, 24,
                 25, 26, 29, 35, 37, 38, 46, 49, 60, 18, 31, 42]
+
+fifa_scores = [1388.61, 1834.21, 1792.53, 1838.45, 1840.93, 1792.43, 1682.85, 1707.22,
+               1631.87, 1731.23, 1594.53, 1647.42, 1631.29, 1664.24, 1653.77, 1730.02,
+               1613.21, 1553.23, 1588.59, 1677.79, 1541.52, 1553.76, 1536.01, 1535.76,
+               1470.21, 1442.66, 1478.13, 1421.46, 1396.01, 1538.95, 1491.12, 1532.79]
 
 probabilities = [0.2]
 teams = [1]
@@ -702,7 +701,6 @@ for t in teams:
         
 
 """
-
 
 m = create_fifa_probability_matrix(fifa_ranking)
 t = create_fifa_knockout_decision_matrix(32, m)
