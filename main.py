@@ -678,6 +678,8 @@ def calculate_probability_by_fifa_scores(fifa_scores, team_1, team_2):
 
 
 def create_fifa_probability_matrix(fifa_scores):
+
+    # TODO add documentation that explain why we fill only the upper third of the matrix
     size = len(fifa_scores)
     matrix = np.full((size, size), 0.0)
     np.fill_diagonal(matrix, -1)
@@ -687,8 +689,7 @@ def create_fifa_probability_matrix(fifa_scores):
 
             if i < j:
 
-                # TODO change to calculate_probability_by_fifa_scores
-                matrix[i][j] = 0.5
+                matrix[i][j] = calculate_probability_by_fifa_scores(fifa_scores, i, j)
 
     return matrix.tolist()
 
@@ -731,4 +732,6 @@ for t in teams:
         
 
 """
+
+
 
