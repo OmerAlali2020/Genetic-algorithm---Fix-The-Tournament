@@ -117,7 +117,9 @@ def create_condorcet_knockout_decision_matrix(size, p):
     return matrix.tolist()
 
 
-def create_fifa_knockout_decision_matrix(size, p_matrix):
+def create_fifa_knockout_decision_matrix(p_matrix):
+
+    size = len(p_matrix)
     matrix = np.zeros((size, size), dtype=int)
     np.fill_diagonal(matrix, -1)
 
@@ -552,7 +554,10 @@ def create_population(size, item_size):
     population = []
 
     for _ in range(size):
-        population.append(create_item(item_size))
+
+        # TODO Change back the function to create_item or change create_population to get many types of
+        #  create item function
+        population.append(create_item_by_tiers())
 
     return population
 
@@ -708,30 +713,22 @@ fifa_scores = [1388.61, 1834.21, 1792.53, 1838.45, 1840.93, 1792.43, 1682.85, 17
                1613.21, 1553.23, 1588.59, 1677.79, 1541.52, 1553.76, 1536.01, 1535.76,
                1470.21, 1442.66, 1478.13, 1421.46, 1396.01, 1538.95, 1491.12, 1532.79]
 
-probabilities = [0.2]
-teams = [1]
-"""
+
+times = 100
+teams = [0]
+s = create_fifa_probability_matrix(fifa_scores)
 
 for t in teams:
 
+    scores = []
+
     print("T:" + str(t))
 
-    for prob in probabilities:
+    for i in range(times):
 
-        scores = []
-        times = 100
+        m = create_fifa_knockout_decision_matrix(s)
+        a = genetic_algorithm(100, 32, m, 5, 0.01, knockout_world_cup, t)
 
-        for i in range(times):
-            m = create_condorcet_knockout_decision_matrix(32, prob)
+        scores.append(a[1])
 
-            a = genetic_algorithm(300, 32, m, 10, 0.01, knockout_match, t)
-
-            scores.append(a[1])
-
-        print(scores.count(6) / times)
-        
-
-"""
-
-
-
+    print(scores.count(6) / times)
