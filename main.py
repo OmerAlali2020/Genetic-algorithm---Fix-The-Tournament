@@ -649,8 +649,36 @@ def genetic_algorithm(population_size, item_size, k_d_matrix, number_of_generati
     return best_individual, best_score
 
 
-def create_fifa_probability_matrix(ranking_array):
-    size = len(ranking_array)
+def calculate_probability_by_fifa_scores(fifa_scores, team_1, team_2):
+
+    # TODO Consider optimizing the function by taking the calculation of the minimum difference out
+
+    n = len(fifa_scores)
+    sorted_scores = sorted(fifa_scores)
+
+    max_d = sorted_scores[n - 1] - sorted_scores[0]
+    min_d = sorted_scores[1] - sorted_scores[0]
+
+    # Calculate the minimum difference between any 2 teams scores
+    for i in range(2, n):
+        min_d = min(min_d, sorted_scores[i] - sorted_scores[i - 1])
+
+    # Calculate the probabilities by normalized the differences to 0.5 <= d <= 1.0
+
+    d = abs(fifa_scores[team_1] - fifa_scores[team_2])
+    d_norm = ((d - min_d) / (max_d - min_d)) * (1 - 0.5) + 0.5
+
+    if fifa_scores[team_1] > fifa_scores[team_2]:
+
+        return d_norm
+
+    else:
+
+        return 1 - d_norm
+
+
+def create_fifa_probability_matrix(fifa_scores):
+    size = len(fifa_scores)
     matrix = np.full((size, size), 0.0)
     np.fill_diagonal(matrix, -1)
 
@@ -658,6 +686,8 @@ def create_fifa_probability_matrix(ranking_array):
         for j in range(size):
 
             if i < j:
+
+                # TODO change to calculate_probability_by_fifa_scores
                 matrix[i][j] = 0.5
 
     return matrix.tolist()
@@ -702,7 +732,3 @@ for t in teams:
 
 """
 
-m = create_fifa_probability_matrix(fifa_ranking)
-t = create_fifa_knockout_decision_matrix(32, m)
-
-print_matrix(t)
