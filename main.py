@@ -171,7 +171,7 @@ def groupStage(group, k_d_matrix):
             if i == j:
                 continue
 
-            if k_d_matrix[i][j] == 1:
+            if k_d_matrix[group[i]-1][group[j]-1] == 1:
                 scores[i] += 1
 
     next_stage = []
@@ -192,7 +192,7 @@ def is_element_in_array(element, array):
     return False
 
 
-def fitness_with_prints(item, k_d_matrix, k, knockout_match):
+def fitness_with_prints(item, k_d_matrix, k, knockout_match, fifa_teams_names):
     fitness_score = 1
 
     # Group stage
@@ -204,7 +204,10 @@ def fitness_with_prints(item, k_d_matrix, k, knockout_match):
     for i in range(len(item)):
         eighth_finals.append(groupStage(item[i], k_d_matrix))
 
-    print("\nWinners: " + str(eighth_finals))
+    print("\nWinners: ")
+
+    for final_team in eighth_finals:
+        print(fifa_teams_names[final_team[0]], fifa_teams_names[final_team[1]])
 
     flag = is_element_in_array(k, eighth_finals)
 
@@ -231,16 +234,18 @@ def fitness_with_prints(item, k_d_matrix, k, knockout_match):
         team_1 = eighth_finals[team1[1] - 1][team1[0]]
         team_2 = eighth_finals[team2[1] - 1][team2[0]]
 
-        print("Game: " + str(team_1) + "-VS-" + str(team_2))
+        print("Game: " + fifa_teams_names[team_1] + "-VS-" + fifa_teams_names[team_2])
 
         if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-            print("Winner: " + str(team_1))
+            print("Winner: " + fifa_teams_names[team_1])
             quarter_final.append(team_1)
         else:
-            print("Winner: " + str(team_2))
+            print("Winner: " + fifa_teams_names[team_2])
             quarter_final.append(team_2)
 
-    print("\nWinners: " + str(quarter_final))
+    print("\nWinners: ")
+    for final_team in quarter_final:
+        print(fifa_teams_names[final_team])
 
     if k in quarter_final:
         fitness_score += 1
@@ -258,16 +263,18 @@ def fitness_with_prints(item, k_d_matrix, k, knockout_match):
         team_1 = quarter_final[i]
         team_2 = quarter_final[i + 1]
 
-        print("Game: " + str(team_1) + "-VS-" + str(team_2))
+        print("Game: " + fifa_teams_names[team_1] + "-VS-" + fifa_teams_names[team_2])
 
         if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-            print("Winner: " + str(team_1))
+            print("Winner: " + fifa_teams_names[team_1])
             semifinals.append(team_1)
         else:
-            print("Winner: " + str(team_2))
+            print("Winner: " + fifa_teams_names[team_2])
             semifinals.append(team_2)
 
-    print("\nWinners: " + str(semifinals))
+    print("\nWinners: ")
+    for final_team in semifinals:
+        print(fifa_teams_names[final_team])
 
     if k in semifinals:
         fitness_score += 1
@@ -285,16 +292,18 @@ def fitness_with_prints(item, k_d_matrix, k, knockout_match):
         team_1 = semifinals[i]
         team_2 = semifinals[i + 1]
 
-        print("Game: " + str(team_1) + "-VS-" + str(team_2))
+        print("Game: " + fifa_teams_names[team_1] + "-VS-" + fifa_teams_names[team_2])
 
         if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-            print("Winner: " + str(team_1))
+            print("Winner: " + fifa_teams_names[team_1])
             final.append(team_1)
         else:
-            print("Winner: " + str(team_2))
+            print("Winner: " + fifa_teams_names[team_2])
             final.append(team_2)
 
     print("\nWinners: " + str(final))
+    for final_team in final:
+        print(fifa_teams_names[final_team])
 
     if k in final:
         fitness_score += 1
@@ -309,10 +318,10 @@ def fitness_with_prints(item, k_d_matrix, k, knockout_match):
     team_2 = final[1]
 
     if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-        print("Final Winner: " + str(team_1))
+        print("Final Winner: " + fifa_teams_names[team_1])
         winner = team_1
     else:
-        print("Final Winner: " + str(team_2))
+        print("Final Winner: " + fifa_teams_names[team_2])
         winner = team_2
 
     if k == winner:
@@ -492,6 +501,8 @@ def partially_Matched_Crossover(parent1, parent2):
 
 
 def scramble_mutation(individual, mutation_rate):
+
+    # TODO Change scramble mutation to another mutation that fit to scheme
     individual = union_subarrays(individual)
     n = len(individual)
 
@@ -713,11 +724,19 @@ fifa_scores = [1388.61, 1834.21, 1792.53, 1838.45, 1840.93, 1792.43, 1682.85, 17
                1613.21, 1553.23, 1588.59, 1677.79, 1541.52, 1553.76, 1536.01, 1535.76,
                1470.21, 1442.66, 1478.13, 1421.46, 1396.01, 1538.95, 1491.12, 1532.79]
 
+# TODO mabey delete None and Chane fitness with print to final_team - 1
+fifa_teams = ['None', 'Qatar', 'Brazil', 'Belgium', 'France', 'Argentina', 'England', 'Spain', 'Portugal',
+              'Mexico','Netherlands', 'Denmark', 'Germany', 'Uruguay', 'Switzerland', 'United States', 'Croatia',
+              'Senegal', 'Iran', 'Japan', 'Morocco', 'Serbia', 'Poland', 'South Korea', 'Tunisia',
+              'Cameroon', 'Canada', 'Ecuador', 'Saudi Arabia', 'Ghana', 'Wales', 'Costa Rica', 'Australia'
+              ]
 
 times = 100
-teams = [0]
-s = create_fifa_probability_matrix(fifa_scores)
+teams = [31, 32]
 
+s = create_fifa_probability_matrix(fifa_scores)
+m = create_fifa_knockout_decision_matrix(s)
+"""
 for t in teams:
 
     scores = []
@@ -727,8 +746,27 @@ for t in teams:
     for i in range(times):
 
         m = create_fifa_knockout_decision_matrix(s)
-        a = genetic_algorithm(100, 32, m, 5, 0.01, knockout_world_cup, t)
+        a = genetic_algorithm(500, 32, m, 300, 0.05, knockout_world_cup, t)
 
+        
+        if a[1] == 6:
+            print_matrix(m)
+            print('\n\n')
+            print(a[0])
+            print('\n')
+            fitness_with_prints(a[0], m, t, knockout_world_cup, fifa_teams)
+            break
+        
         scores.append(a[1])
 
     print(scores.count(6) / times)
+
+"""
+
+
+
+
+
+
+
+
