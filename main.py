@@ -494,6 +494,7 @@ def partially_Matched_Crossover(parent1, parent2):
             while child2[i] in mapping2:
                 child2[i] = mapping2[child2[i]]
 
+    # TODO Change this //8
     child1 = np.reshape(child1, (8, n // 8))
     child2 = np.reshape(child2, (8, n // 8))
 
@@ -503,26 +504,23 @@ def partially_Matched_Crossover(parent1, parent2):
 def scramble_mutation(individual, mutation_rate):
 
     # TODO Change scramble mutation to another mutation that fit to scheme
-    individual = union_subarrays(individual)
-    n = len(individual)
+    if random.random() < mutation_rate:
 
-    for i in range(n):
+        number_of_groups = len(individual)
+        number_of_teams = len(individual[0])
 
-        if random.random() < mutation_rate:
+        for i in range(number_of_groups):
 
-            # Select two random positions in the individual
+            position = random.randint(0, number_of_teams-1)
+            destination_group = random.randint(0, number_of_groups-1)
 
-            pos1 = random.randint(0, len(individual) - 1)
-            pos2 = random.randint(0, len(individual) - 1)
-
-            while pos1 == pos2:
-                pos2 = random.randint(0, len(individual) - 1)
+            while i == destination_group:
+                destination_group = random.randint(0, number_of_groups-1)
 
             # Scramble the values at the selected positions
-
-            individual[pos1], individual[pos2] = individual[pos2], individual[pos1]
-
-    individual = np.reshape(individual, (8, n // 8))
+            placeholder = individual[i][position]
+            individual[i][position] = individual[destination_group][position]
+            individual[destination_group][position] = placeholder
 
     return individual
 
@@ -732,23 +730,21 @@ fifa_teams = ['None', 'Qatar', 'Brazil', 'Belgium', 'France', 'Argentina', 'Engl
               ]
 
 times = 100
-teams = [31, 32]
+teams = []
 
 s = create_fifa_probability_matrix(fifa_scores)
-m = create_fifa_knockout_decision_matrix(s)
-"""
+
+
 for t in teams:
 
     scores = []
 
-    print("T:" + str(t))
-
     for i in range(times):
 
         m = create_fifa_knockout_decision_matrix(s)
-        a = genetic_algorithm(500, 32, m, 300, 0.05, knockout_world_cup, t)
+        a = genetic_algorithm(500, 32, m, 300, 0.0, knockout_world_cup, t)
 
-        
+        """
         if a[1] == 6:
             print_matrix(m)
             print('\n\n')
@@ -756,17 +752,9 @@ for t in teams:
             print('\n')
             fitness_with_prints(a[0], m, t, knockout_world_cup, fifa_teams)
             break
-        
+        """
         scores.append(a[1])
 
     print(scores.count(6) / times)
-
-"""
-
-
-
-
-
-
 
 
