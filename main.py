@@ -446,6 +446,10 @@ def union_subarrays(array):
 
 
 def partially_Matched_Crossover(parent1, parent2):
+
+    number_of_groups = len(parent1)
+
+    # Union subarray to enable PMX operate on the item
     parent1 = union_subarrays(parent1)
     parent2 = union_subarrays(parent2)
 
@@ -494,16 +498,14 @@ def partially_Matched_Crossover(parent1, parent2):
             while child2[i] in mapping2:
                 child2[i] = mapping2[child2[i]]
 
-    # TODO Change this //8
-    child1 = np.reshape(child1, (8, n // 8))
-    child2 = np.reshape(child2, (8, n // 8))
+    child1 = np.reshape(child1, (number_of_groups, n // number_of_groups))
+    child2 = np.reshape(child2, (number_of_groups, n // number_of_groups))
 
     return child1, child2
 
 
 def scramble_mutation(individual, mutation_rate):
 
-    # TODO Change scramble mutation to another mutation that fit to scheme
     if random.random() < mutation_rate:
 
         number_of_groups = len(individual)
@@ -566,7 +568,7 @@ def create_population(size, item_size):
 
         # TODO Change back the function to create_item or change create_population to get many types of
         #  create item function
-        population.append(create_item_by_tiers())
+        population.append(create_item(item_size))
 
     return population
 
@@ -714,7 +716,7 @@ knockout_match = [[(0, 1), (0, 2)], [(0, 3), (0, 4)], [(0, 5), (0, 6)], [(0, 7),
 knockout_world_cup = [[(0, 1), (1, 2)], [(0, 3), (1, 4)], [(0, 5), (1, 6)], [(0, 7), (1, 8)],
                       [(0, 2), (1, 1)], [(0, 4), (1, 3)], [(0, 6), (1, 5)], [(0, 8), (1, 7)]]
 
-fifa_ranking = [51, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 20, 21, 23, 24,
+fifa_ranking = [61, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 20, 21, 23, 24,
                 25, 26, 29, 35, 37, 38, 46, 49, 60, 18, 31, 42]
 
 fifa_scores = [1388.61, 1834.21, 1792.53, 1838.45, 1840.93, 1792.43, 1682.85, 1707.22,
@@ -730,31 +732,30 @@ fifa_teams = ['None', 'Qatar', 'Brazil', 'Belgium', 'France', 'Argentina', 'Engl
               ]
 
 times = 100
-teams = []
+# [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+# 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 1]
 
-s = create_fifa_probability_matrix(fifa_scores)
+teams = [24, 1]
+prob = [0.4, 0.2, 0.1, 0.05, 0.01]
 
-
+"""
 for t in teams:
 
-    scores = []
+    print("T: " + str(t))
 
-    for i in range(times):
+    for p in prob:
 
-        m = create_fifa_knockout_decision_matrix(s)
-        a = genetic_algorithm(500, 32, m, 300, 0.0, knockout_world_cup, t)
+        scores = []
 
-        """
-        if a[1] == 6:
-            print_matrix(m)
-            print('\n\n')
-            print(a[0])
-            print('\n')
-            fitness_with_prints(a[0], m, t, knockout_world_cup, fifa_teams)
-            break
-        """
-        scores.append(a[1])
+        for i in range(times):
 
-    print(scores.count(6) / times)
+            m = create_condorcet_knockout_decision_matrix(128, p)
+            a = genetic_algorithm(500, 128, m, 300, 0.05, knockout_world_cup, t)
+        
+            scores.append(a[1])
+
+        print(scores.count(6) / times)
+"""
+
 
 
