@@ -436,6 +436,134 @@ def fitness(item, k_d_matrix, k, knockout_match):
     return fitness_score
 
 
+def fitness_new_format(item, k_d_matrix, k, knockout_match):
+
+    # TODO check new fittness function step by step with prints
+
+    fitness_score = 1
+
+    # Group stage
+
+    round_of_32 = []
+
+    for i in range(len(item)):
+        round_of_32.append(groupStage(item[i], k_d_matrix))
+
+    flag = is_element_in_array(k, round_of_32)
+
+    if flag is True:
+
+        fitness_score += 1
+    else:
+        return fitness_score
+
+    # Knockout stage - Round of 16
+
+    eighth_final = []
+
+    for i in knockout_match:
+        # Go through every knockout match in the fixture list, check which team
+        # wins and advance them to the quarter final stage.
+
+        team1 = i[0]
+        team2 = i[1]
+
+        team_1 = round_of_32[team1[1] - 1][team1[0]]
+        team_2 = round_of_32[team2[1] - 1][team2[0]]
+
+        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
+
+            eighth_final.append(team_1)
+        else:
+
+            eighth_final.append(team_2)
+
+    if k in eighth_final:
+        fitness_score += 1
+    else:
+        return fitness_score
+
+    # Eighth - finals stage
+
+    quarter_final = []
+
+    for i in range(0, 16, 2):
+
+        team_1 = eighth_final[i]
+        team_2 = eighth_final[i + 1]
+
+        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
+
+            quarter_final.append(team_1)
+        else:
+
+            quarter_final.append(team_2)
+
+    if k in quarter_final:
+        fitness_score += 1
+    else:
+        return fitness_score
+
+    # Quarter final stage
+
+    semifinals = []
+
+    for i in range (0, 8, 2):
+
+        team_1 = quarter_final[i]
+        team_2 = quarter_final[i + 1]
+
+        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
+
+            semifinals.append(team_1)
+        else:
+
+            semifinals.append(team_2)
+
+    if k in semifinals:
+        fitness_score += 1
+    else:
+        return fitness_score
+
+    # SemiFinal stage
+
+    final = []
+
+    for i in range(0, 4, 2):
+
+        team_1 = semifinals[i]
+        team_2 = semifinals[i + 1]
+
+        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
+
+            final.append(team_1)
+        else:
+
+            final.append(team_2)
+
+    if k in final:
+        fitness_score += 1
+    else:
+        return fitness_score
+
+    # Final stage
+
+    team_1 = final[0]
+    team_2 = final[1]
+
+    if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
+
+        winner = team_1
+    else:
+
+        winner = team_2
+
+    if k == winner:
+        fitness_score += 1
+
+    return fitness_score
+
+
 def union_subarrays(array):
     union_array = []
 
@@ -712,14 +840,14 @@ def create_fifa_probability_matrix(fifa_scores):
     return matrix.tolist()
 
 
-knockout_match = [[(0, 1), (0, 2)], [(0, 3), (0, 4)], [(0, 5), (0, 6)], [(0, 7), (0, 8)],
-                  [(1, 1), (1, 2)], [(1, 3), (1, 4)], [(1, 5), (1, 6)], [(1, 7), (1, 8)]]
-
 knockout_world_cup = [[(0, 1), (1, 2)], [(0, 3), (1, 4)], [(0, 5), (1, 6)], [(0, 7), (1, 8)],
                       [(0, 2), (1, 1)], [(0, 4), (1, 3)], [(0, 6), (1, 5)], [(0, 8), (1, 7)]]
 
-fifa_ranking = [61, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 20, 21, 23, 24,
-                25, 26, 29, 35, 37, 38, 46, 49, 60, 18, 31, 42]
+knockout_new_format_world_cup = [[(0, 1), (1, 2)], [(0, 3), (1, 4)], [(0, 5), (1, 6)], [(0, 7), (1, 8)],
+                                 [(0, 2), (1, 1)], [(0, 4), (1, 3)], [(0, 6), (1, 5)], [(0, 8), (1, 7)],
+                                [(0, 9), (1, 10)], [(0, 11), (1, 12)], [(0, 13), (1, 14)], [(0, 15), (1, 16)],
+                                 [(0, 10), (1, 9)], [(0, 12), (1, 11)], [(0, 14), (1, 13)], [(0, 16), (1, 15)]]
+
 
 fifa_scores = [1388.61, 1834.21, 1792.53, 1838.45, 1840.93, 1792.43, 1682.85, 1707.22,
                1631.87, 1731.23, 1594.53, 1647.42, 1631.29, 1664.24, 1653.77, 1730.02,
@@ -742,7 +870,7 @@ prob = [0.4, 0.2, 0.1, 0.05, 0.01]
 item_size = 32
 num_of_groups = 8
 
-
+"""
 for t in teams:
 
     print("T: " + str(t))
@@ -759,6 +887,8 @@ for t in teams:
             scores.append(a[1])
 
         print(scores.count(6) / times)
+
+"""
 
 
 
