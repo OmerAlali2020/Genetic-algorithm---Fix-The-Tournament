@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 
-def create_item(size):
+def create_item(size, number_of_groups):
     """
     Create an array of size 32, randomly place numbers from 1 to 32, and divide it into 8 sub-arrays of size 4.
 
@@ -20,10 +20,11 @@ def create_item(size):
                [20, 21, 27, 24],
                [14,  1,  4, 29]])
     """
+
     numbers = np.arange(1, size + 1)
     np.random.shuffle(numbers)
-    subarrays = numbers.reshape((8, size // 8))
-    return subarrays
+    sub_arrays = numbers.reshape((number_of_groups, size // number_of_groups))
+    return sub_arrays
 
 
 def create_item_by_tiers():
@@ -545,7 +546,8 @@ def roulette_wheel_selection(population, fitness):
     return population[choice]
 
 
-def create_population(size, item_size):
+def create_population(size, item_size, number_of_groups):
+
     """
     Creates a population of individuals.
 
@@ -568,7 +570,7 @@ def create_population(size, item_size):
 
         # TODO Change back the function to create_item or change create_population to get many types of
         #  create item function
-        population.append(create_item(item_size))
+        population.append(create_item(item_size, number_of_groups))
 
     return population
 
@@ -596,7 +598,7 @@ def evaluate_population_fitness(population, k_d_matrix, k, knockout_match):
     return fitness_array
 
 
-def genetic_algorithm(population_size, item_size, k_d_matrix, number_of_generations, mutation_rate,
+def genetic_algorithm(population_size, item_size, number_of_groups, k_d_matrix, number_of_generations, mutation_rate,
                       knockout_match_array, selected_individual):
     """
         Executes a genetic algorithm to find the best individual in a population.
@@ -619,7 +621,7 @@ def genetic_algorithm(population_size, item_size, k_d_matrix, number_of_generati
 
     # Initialize the population
 
-    population = create_population(population_size, item_size)
+    population = create_population(population_size, item_size, number_of_groups)
     population_fitness = evaluate_population_fitness(population, k_d_matrix, selected_individual, knockout_match_array)
 
     # Do until the selected individual has won the tournament or until the maximum amount of generations
@@ -735,10 +737,12 @@ times = 100
 # [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
 # 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 1]
 
-teams = [24, 1]
+teams = [32]
 prob = [0.4, 0.2, 0.1, 0.05, 0.01]
+item_size = 32
+num_of_groups = 8
 
-"""
+
 for t in teams:
 
     print("T: " + str(t))
@@ -750,12 +754,12 @@ for t in teams:
         for i in range(times):
 
             m = create_condorcet_knockout_decision_matrix(128, p)
-            a = genetic_algorithm(500, 128, m, 300, 0.05, knockout_world_cup, t)
+            a = genetic_algorithm(100, item_size ,num_of_groups, m, 10, 0.05, knockout_world_cup, t)
         
             scores.append(a[1])
 
         print(scores.count(6) / times)
-"""
+
 
 
 
