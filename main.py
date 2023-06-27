@@ -3,14 +3,19 @@ import numpy as np
 
 
 def create_item(size, number_of_groups):
+
     """
-    Create an array of size 32, randomly place numbers from 1 to 32, and divide it into 8 sub-arrays of size 4.
+    Create an array of size 'size' divided into 'number_of_groups' subarrays of size 'size // number_of_groups'.
+
+    Args:
+        size (int): The number of teams in the tournament.
+        number_of_groups (int): The number of groups to divide the teams into.
 
     Returns:
-        numpy.ndarray: An array of size 32 divided into 8 sub-arrays of size 4.
+        np.ndarray: An array of size 'size' divided into 'number_of_groups' subarrays of size 'size // number_of_groups'.
 
     Example:
-        >>> create_subarrays()
+        >>> create_item(32, 8)
         array([[12,  5,  7, 10],
                [22, 16,  2, 11],
                [31, 19,  8, 30],
@@ -28,26 +33,29 @@ def create_item(size, number_of_groups):
 
 
 def create_item_by_tiers():
+
+    # TODO שקול לאפטם את הפונקציה
+
     """
-    Create an array of size 32, randomly place numbers from 1 to 32, and divide it into 8 sub-arrays of size 4.
+    Generate team arrangements based on tiers.
 
     Returns:
-        numpy.ndarray: An array of size 32 divided into 8 sub-arrays of size 4.
+    list: A list of team arrangements in size 32. Each arrangement is a list of teams, where in each group
+    there are 4 groups from 4 different tiers
 
     Example:
-        >>> create_subarrays()
-        array([[12,  5,  7, 10],
-               [22, 16,  2, 11],
-               [31, 19,  8, 30],
-               [13, 25, 17, 23],
-               [32, 15,  3,  9],
-               [26, 28,  6, 18],
-               [20, 21, 27, 24],
-               [14,  1,  4, 29]])
+        >>> create_item_by_tiers()
+        [[6, 10, 23, 30],
+         [7, 14, 21, 28],
+         [5, 13, 19, 29],
+         [1, 12, 18, 26],
+         [4, 9, 22, 25],
+         [2, 16, 17, 32],
+         [8, 11, 15, 20],
+         [3, 24, 27, 31]]
     """
 
     groups = 8
-    tiers = 4
     item = []
 
     tier_1 = np.arange(1, 9)
@@ -76,7 +84,22 @@ def create_item_by_tiers():
     return item
 
 
-def create_knockout_decision_matrix(size) -> list:
+def create_knockout_decision_matrix(size):
+
+    """
+    Create a matrix at size 'size' and determine randomly at each index i,j whether group i beats j.
+
+    Returns:
+    list: a matrix as a list of size 'size'. A win is 1,
+    a loss is 0. The diagonal is coded to -1.
+
+
+    Example:
+        >>> create_knockout_decision_matrix(2)
+        [[-1, 0],
+        [1, -1]]
+    """
+
     matrix = np.random.randint(2, size=(size, size))
     np.fill_diagonal(matrix, -1)
 
@@ -92,6 +115,21 @@ def create_knockout_decision_matrix(size) -> list:
 
 
 def generate_zero_or_one(p):
+
+    """
+    generate 0 or 1 by probabilty p
+
+    Args:
+    p (float): The probabilty to get 1
+
+    Returns:
+    int: 0 or 1
+
+    Example:
+    >>> generate_zero_or_one(0.3)
+    0
+    """
+
     choices = [1, 0]
     probabilities = [p, 1 - p]
     result = random.choices(choices, probabilities)[0]
@@ -99,6 +137,27 @@ def generate_zero_or_one(p):
 
 
 def create_condorcet_knockout_decision_matrix(size, p):
+
+    """
+
+    Create a matrix of size 'size' and determine with probability p for each index i,j if team i beats j,
+    under Condresa model
+
+    Args:
+    size (int): The matrix size
+    p (float): The probabilty to get 1
+
+    Returns:
+    list: a matrix as a list of size 'size'. A win is 1, a loss is 0. The diagonal is
+    coded to -1.
+
+
+    Example:
+        >>> create_condorcet_knockout_decision_matrix(2, 0.2)
+        [[-1, 0],
+        [1, -1]]
+    """
+
     matrix = np.zeros((size, size), dtype=int)
     np.fill_diagonal(matrix, -1)
 
@@ -119,6 +178,24 @@ def create_condorcet_knockout_decision_matrix(size, p):
 
 
 def create_fifa_knockout_decision_matrix(p_matrix):
+
+    """
+    Create a matrix of size 'size' and determine with probability p by p_matrix for each index i,j if team i beats j,
+    under Condresa model
+
+    Args:
+    p_matrix (list): Probability matrix of victories for all two teams i,j according to FIFA data
+
+    Returns:
+    list: a matrix as a list of size 'size'. A win is 1, a loss is 0. The diagonal is
+    coded to -1.
+
+
+    Example:
+        >>> create_fifa_knockout_decision_matrix(m)
+        [[-1, 0],
+        [1, -1]]
+    """
 
     size = len(p_matrix)
     matrix = np.zeros((size, size), dtype=int)
@@ -145,12 +222,9 @@ def print_matrix(matrix):
     Print a matrix in a nicely formatted manner.
 
     Args:
-        matrix (list): The matrix to be printed.
+    matrix (list): The matrix to be printed.
 
     Example:
-        >>> matrix = [[1, 2, 3],
-                      [4, 5, 6],
-                      [7, 8, 9]]
         >>> print_matrix(matrix)
         1  2  3
         4  5  6
@@ -161,8 +235,23 @@ def print_matrix(matrix):
 
 
 def groupStage(group, k_d_matrix):
-    # run the group stage so each team plays against each team in its stage and the two best teams advance to the
-    # next stage
+
+    """
+    Run the group stage so each team plays against each team in its stage and return the two highest scoring teams
+
+    Args:
+    group (list): The list of the teams that are in the group
+    k_d_matrix (list): A victory matrix where in each index it is determined whether team i wins against team j
+
+    Returns:
+    list: The two teams that advanced to the next stage.
+
+    Example:
+    >>> groupStage(group2, m)
+    (1,17)
+    """
+
+    # run the group stage so each team plays against each team in its stage
 
     scores = [0] * len(group)
 
@@ -174,6 +263,8 @@ def groupStage(group, k_d_matrix):
 
             if k_d_matrix[group[i]-1][group[j]-1] == 1:
                 scores[i] += 1
+
+    # Choose the two teams that got the highest score
 
     next_stage = []
 
@@ -187,6 +278,23 @@ def groupStage(group, k_d_matrix):
 
 
 def is_element_in_array(element, array):
+    """
+    Check if an element is present in a nested array.
+
+    Args:
+        element: The element to search for.
+        array: The nested array to search in.
+
+    Returns:
+        bool: True if the element is found in the array, False otherwise.
+
+    Example:
+        >>> is_element_in_array(4, [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        True
+
+        >>> is_element_in_array(10, [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        False
+    """
     for sub_array in array:
         if element in sub_array:
             return True
@@ -438,8 +546,6 @@ def fitness(item, k_d_matrix, k, knockout_match):
 
 def fitness_new_format(item, k_d_matrix, k, knockout_match):
 
-    # TODO check new fittness function step by step with prints
-
     fitness_score = 1
 
     # Group stage
@@ -508,6 +614,7 @@ def fitness_new_format(item, k_d_matrix, k, knockout_match):
 
     semifinals = []
 
+    # TODO fix any place like this in all fitness functions to len of the array
     for i in range (0, 8, 2):
 
         team_1 = quarter_final[i]
@@ -565,6 +672,19 @@ def fitness_new_format(item, k_d_matrix, k, knockout_match):
 
 
 def union_subarrays(array):
+    """
+    Flatten a nested array and return the union of all subarrays.
+
+    Args:
+        array: The nested array to flatten.
+
+    Returns:
+        list: A list containing all the elements from the subarrays.
+
+    Example:
+        >>> union_subarrays([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    """
     union_array = []
 
     for subarray in array:
@@ -575,7 +695,22 @@ def union_subarrays(array):
 
 
 def partially_Matched_Crossover(parent1, parent2):
+    """
+    Perform Partially Matched Crossover (PMX) on two parent arrays.
 
+    Args:
+        parent1: The first parent array.
+        parent2: The second parent array.
+
+    Returns:
+        tuple: A tuple containing two child arrays resulting from PMX.
+
+    Example:
+        >>> parent1 = [[1,2,3],[5,4,6]]
+        >>> parent2 = [[6,5,4], [3,2,1]]
+        >>> partially_Matched_Crossover(parent1, parent2)
+        ([[6, 2, 3], [5, 4, 1]], [[1, 5, 4], [3, 2, 6]])
+    """
     number_of_groups = len(parent1)
 
     # Union subarray to enable PMX operate on the item
@@ -585,28 +720,23 @@ def partially_Matched_Crossover(parent1, parent2):
     n = len(parent1)
 
     # Choose two cut points at random
-
     cut1 = np.random.randint(0, n)
     cut2 = np.random.randint(0, n)
 
     # Ensure cut1 is the smaller cut point
-
     if cut1 > cut2:
         cut1, cut2 = cut2, cut1
 
     # Initialize the children
-
     child1 = [-1] * n
     child2 = [-1] * n
 
     # Copy the segment between the cut points from parent1 to child1 and from parent2 to child2
-
     for i in range(cut1, cut2):
         child1[i] = parent1[i]
         child2[i] = parent2[i]
 
     # Copy the remaining genes from parent2 to child1 and from parent1 to child2
-
     for i in range(n):
         if i < cut1 or i >= cut2:
             child1[i] = parent2[i]
@@ -620,7 +750,6 @@ def partially_Matched_Crossover(parent1, parent2):
         mapping2[parent2[i]] = parent1[i]
 
     for i in range(n):
-
         if i < cut1 or i >= cut2:
             while child1[i] in mapping1:
                 child1[i] = mapping1[child1[i]]
@@ -634,14 +763,27 @@ def partially_Matched_Crossover(parent1, parent2):
 
 
 def scramble_mutation(individual, mutation_rate):
+    """
+    Apply scramble mutation to an individual array.
 
+    Args:
+        individual: The individual array to mutate.
+        mutation_rate: The probability of mutation for each element.
+
+    Returns:
+        list: The mutated individual array.
+
+    Example:
+        >>> individual = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        >>> mutation_rate = 0.1
+        >>> scramble_mutation(individual, mutation_rate)
+        [[1, 2, 3], [4, 5, 6], [7, 9, 8]]
+    """
     if random.random() < mutation_rate:
-
         number_of_groups = len(individual)
         number_of_teams = len(individual[0])
 
         for i in range(number_of_groups):
-
             position = random.randint(0, number_of_teams-1)
             destination_group = random.randint(0, number_of_groups-1)
 
@@ -657,18 +799,30 @@ def scramble_mutation(individual, mutation_rate):
 
 
 def roulette_wheel_selection(population, fitness):
-    # Computes the totallity of the population fitness
+    """
+    Perform roulette wheel selection to choose an individual from the population based on fitness.
+
+    Args:
+        population: The population of individuals.
+        fitness: The fitness values corresponding to each individual in the population.
+
+    Returns:
+        list: The selected individual from the population.
+
+    Example:
+        >>> population = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        >>> fitness = [0.1, 0.4, 0.5]
+        >>> roulette_wheel_selection(population, fitness)
+        [7, 8, 9]
+    """
+    # Compute the total fitness of the population
     population_fitness = sum(fitness)
 
-    # Computes for each chromosome the probability
-    chromosome_probabilities = []
+    # Compute the probability for each chromosome
+    chromosome_probabilities = [i / population_fitness for i in fitness]
 
-    for i in fitness:
-        chromosome_probabilities.append(i / population_fitness)
-
-    # Selects one chromosome based on the computed probabilities
-
-    population_index = list(range(0, len(population)))
+    # Select one chromosome based on the computed probabilities
+    population_index = list(range(len(population)))
     choice = np.random.choice(population_index, p=chromosome_probabilities)
 
     return population[choice]
@@ -681,6 +835,8 @@ def create_population(size, item_size, number_of_groups):
 
     Parameters:
         size (int): The desired size of the population.
+        item_size (int): The number of teams of each item
+        number_of_groups: The number of groups of each item
 
     Returns:
         list: A list of individuals representing the population.
@@ -704,6 +860,7 @@ def create_population(size, item_size, number_of_groups):
 
 
 def evaluate_population_fitness(population, k_d_matrix, k, knockout_match):
+
     """
           Calculates the fitness of each individual in the population.
 
@@ -721,23 +878,27 @@ def evaluate_population_fitness(population, k_d_matrix, k, knockout_match):
     fitness_array = []
 
     for item in population:
-        fitness_array.append(fitness(item, k_d_matrix, k, knockout_match))
+        # TODO change back fitness_new_format to fitness
+        fitness_array.append(fitness_new_format(item, k_d_matrix, k, knockout_match))
 
     return fitness_array
 
 
 def genetic_algorithm(population_size, item_size, number_of_groups, k_d_matrix, number_of_generations, mutation_rate,
-                      knockout_match_array, selected_individual):
+                      knockout_match_array, selected_individual, knockout_rounds):
     """
         Executes a genetic algorithm to find the best individual in a population.
 
         Parameters:
             population_size (int): The size of the population.
+            item_size (int): the number of teams of each item
+            number_of_groups (int): the number of groups of each item
             k_d_matrix (list): the result matrix of 1:1 matches between the teams (does team i win/lose to team j)
             number_of_generations (int): The number of generations to run the genetic algorithm.
             mutation_rate (float): The rate at which mutations occur during offspring generation.
             knockout_match_array (list): the transition function from the house stage to the knockout stage
             selected_individual (int): the individual we are interested in.
+            knockout_rounds (int): The number of knockout rounds in the game
 
         Returns:
             tuple: A tuple containing the best individual found and its corresponding score.
@@ -754,9 +915,12 @@ def genetic_algorithm(population_size, item_size, number_of_groups, k_d_matrix, 
 
     # Do until the selected individual has won the tournament or until the maximum amount of generations
 
+    # TODO check if the function work correct
+    max_score = knockout_rounds + 1
+
     for i in range(number_of_generations):
 
-        if max(population_fitness) == 6:
+        if max(population_fitness) == max_score:
             # The individual we want won the tournament
 
             best_score = max(population_fitness)
@@ -799,42 +963,71 @@ def calculate_probability_by_fifa_scores(fifa_scores, team_1, team_2):
 
     # TODO Consider optimizing the function by taking the calculation of the minimum difference out
 
+    """
+    Calculate the probability of a team winning based on FIFA scores.
+
+    Args:
+        fifa_scores (list): The list of FIFA scores for each team.
+        team_1 (int): The ID of the first team.
+        team_2 (int): The ID of the second team.
+
+    Returns:
+        float: The probability of the first team winning against the second team.
+
+    Example:
+        >>> fifa_scores = [90, 85, 88, 92, 87]
+        >>> team_1 = 1
+        >>> team_2 = 3
+        >>> calculate_probability_by_fifa_scores(fifa_scores, team_1, team_2)
+        0.75
+    """
     n = len(fifa_scores)
     sorted_scores = sorted(fifa_scores)
 
     max_d = sorted_scores[n - 1] - sorted_scores[0]
     min_d = sorted_scores[1] - sorted_scores[0]
 
-    # Calculate the minimum difference between any 2 teams scores
+    # Calculate the minimum difference between any 2 teams' scores
     for i in range(2, n):
         min_d = min(min_d, sorted_scores[i] - sorted_scores[i - 1])
 
-    # Calculate the probabilities by normalized the differences to 0.5 <= d <= 1.0
+    # Calculate the probabilities by normalizing the differences to 0.5 <= d <= 1.0
 
     d = abs(fifa_scores[team_1] - fifa_scores[team_2])
     d_norm = ((d - min_d) / (max_d - min_d)) * (1 - 0.5) + 0.5
 
     if fifa_scores[team_1] > fifa_scores[team_2]:
-
         return d_norm
-
     else:
-
         return 1 - d_norm
 
 
 def create_fifa_probability_matrix(fifa_scores):
 
-    # TODO add documentation that explain why we fill only the upper third of the matrix
+    """
+    Create a probability matrix based on FIFA scores.
+
+    Args:
+        fifa_scores (list): The list of FIFA scores for each team.
+
+    Returns:
+        list: The probability matrix where each element represents the probability of the corresponding teams' match.
+
+    Example:
+        >>> fifa_scores = [90, 85, 88, 92]
+        >>> create_fifa_probability_matrix(fifa_scores)
+        [[-1, 0.6, 0.75, 0.4],
+         [-1, -1, 0.5, 0.8],
+         [-1, -1, -1, 0.7],
+         [-1, -1, -1, -1]]
+    """
     size = len(fifa_scores)
     matrix = np.full((size, size), 0.0)
     np.fill_diagonal(matrix, -1)
 
     for i in range(size):
         for j in range(size):
-
             if i < j:
-
                 matrix[i][j] = calculate_probability_by_fifa_scores(fifa_scores, i, j)
 
     return matrix.tolist()
@@ -861,34 +1054,9 @@ fifa_teams = ['None', 'Qatar', 'Brazil', 'Belgium', 'France', 'Argentina', 'Engl
               'Cameroon', 'Canada', 'Ecuador', 'Saudi Arabia', 'Ghana', 'Wales', 'Costa Rica', 'Australia'
               ]
 
-times = 100
-# [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-# 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 1]
+print (create_item_by_tiers())
 
-teams = [32]
-prob = [0.4, 0.2, 0.1, 0.05, 0.01]
-item_size = 32
-num_of_groups = 8
 
-"""
-for t in teams:
-
-    print("T: " + str(t))
-
-    for p in prob:
-
-        scores = []
-
-        for i in range(times):
-
-            m = create_condorcet_knockout_decision_matrix(128, p)
-            a = genetic_algorithm(100, item_size ,num_of_groups, m, 10, 0.05, knockout_world_cup, t)
-        
-            scores.append(a[1])
-
-        print(scores.count(6) / times)
-
-"""
 
 
 
