@@ -879,7 +879,7 @@ def evaluate_population_fitness(population, k_d_matrix, k, knockout_match):
 
     for item in population:
         # TODO change back fitness_new_format to fitness
-        fitness_array.append(fitness_new_format(item, k_d_matrix, k, knockout_match))
+        fitness_array.append(fitness(item, k_d_matrix, k, knockout_match))
 
     return fitness_array
 
@@ -915,8 +915,7 @@ def genetic_algorithm(population_size, item_size, number_of_groups, k_d_matrix, 
 
     # Do until the selected individual has won the tournament or until the maximum amount of generations
 
-    # TODO check if the function work correct
-    max_score = knockout_rounds + 1
+    max_score = knockout_rounds + 2
 
     for i in range(number_of_generations):
 
@@ -961,8 +960,6 @@ def genetic_algorithm(population_size, item_size, number_of_groups, k_d_matrix, 
 
 def calculate_probability_by_fifa_scores(fifa_scores, team_1, team_2):
 
-    # TODO Consider optimizing the function by taking the calculation of the minimum difference out
-
     """
     Calculate the probability of a team winning based on FIFA scores.
 
@@ -994,7 +991,7 @@ def calculate_probability_by_fifa_scores(fifa_scores, team_1, team_2):
     # Calculate the probabilities by normalizing the differences to 0.5 <= d <= 1.0
 
     d = abs(fifa_scores[team_1] - fifa_scores[team_2])
-    d_norm = ((d - min_d) / (max_d - min_d)) * (1 - 0.5) + 0.5
+    d_norm = ((d - min_d) / (max_d - min_d)) * 0.5 + 0.5
 
     if fifa_scores[team_1] > fifa_scores[team_2]:
         return d_norm
@@ -1053,8 +1050,6 @@ fifa_teams = ['None', 'Qatar', 'Brazil', 'Belgium', 'France', 'Argentina', 'Engl
               'Senegal', 'Iran', 'Japan', 'Morocco', 'Serbia', 'Poland', 'South Korea', 'Tunisia',
               'Cameroon', 'Canada', 'Ecuador', 'Saudi Arabia', 'Ghana', 'Wales', 'Costa Rica', 'Australia'
               ]
-
-print (create_item_by_tiers())
 
 
 
