@@ -3,7 +3,6 @@ import numpy as np
 
 
 def create_item(size, number_of_groups):
-
     """
     Create an array of size 'size' divided into 'number_of_groups' subarrays of size 'size // number_of_groups'.
 
@@ -33,7 +32,6 @@ def create_item(size, number_of_groups):
 
 
 def create_item_by_tiers():
-
     """
     Generate team arrangements based on tiers.
 
@@ -86,7 +84,6 @@ def create_item_by_tiers():
 
 
 def create_knockout_decision_matrix(size):
-
     """
     Create a matrix at size 'size' and determine randomly at each index i,j whether group i beats j.
 
@@ -116,7 +113,6 @@ def create_knockout_decision_matrix(size):
 
 
 def generate_zero_or_one(p):
-
     """
     generate 0 or 1 by probabilty p
 
@@ -138,7 +134,6 @@ def generate_zero_or_one(p):
 
 
 def create_condorcet_knockout_decision_matrix(size, p):
-
     """
 
     Create a matrix of size 'size' and determine with probability p for each index i,j if team i beats j,
@@ -179,7 +174,6 @@ def create_condorcet_knockout_decision_matrix(size, p):
 
 
 def create_fifa_knockout_decision_matrix(p_matrix):
-
     """
     Create a matrix of size 'size' and determine with probability p by p_matrix for each index i,j if team i beats j,
     under Condresa model
@@ -236,7 +230,6 @@ def print_matrix(matrix):
 
 
 def groupStage(group, k_d_matrix):
-
     """
     Run the group stage so each team plays against each team in its stage and return the two highest scoring teams
 
@@ -262,7 +255,7 @@ def groupStage(group, k_d_matrix):
             if i == j:
                 continue
 
-            if k_d_matrix[group[i]-1][group[j]-1] == 1:
+            if k_d_matrix[group[i] - 1][group[j] - 1] == 1:
                 scores[i] += 1
 
     # Choose the two teams that got the highest score
@@ -302,250 +295,6 @@ def is_element_in_array(element, array):
     return False
 
 
-def fitness_with_prints(item, k_d_matrix, k, knockout_match, fifa_teams_names):
-    fitness_score = 1
-
-    # Group stage
-
-    print("\n___Group stage___\n")
-
-    eighth_finals = []
-
-    for i in range(len(item)):
-        eighth_finals.append(groupStage(item[i], k_d_matrix))
-
-    print("\nWinners: ")
-
-    for final_team in eighth_finals:
-        print(fifa_teams_names[final_team[0]], fifa_teams_names[final_team[1]])
-
-    flag = is_element_in_array(k, eighth_finals)
-
-    if flag is True:
-
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # Knockout stage
-    # Eighth final
-
-    print("\n___Eighth final___\n")
-
-    quarter_final = []
-
-    for i in knockout_match:
-        # Go through every knockout match in the fixture list, check which team
-        # wins and advance them to the quarter final stage.
-
-        team1 = i[0]
-        team2 = i[1]
-
-        team_1 = eighth_finals[team1[1] - 1][team1[0]]
-        team_2 = eighth_finals[team2[1] - 1][team2[0]]
-
-        print("Game: " + fifa_teams_names[team_1] + "-VS-" + fifa_teams_names[team_2])
-
-        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-            print("Winner: " + fifa_teams_names[team_1])
-            quarter_final.append(team_1)
-        else:
-            print("Winner: " + fifa_teams_names[team_2])
-            quarter_final.append(team_2)
-
-    print("\nWinners: ")
-    for final_team in quarter_final:
-        print(fifa_teams_names[final_team])
-
-    if k in quarter_final:
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # Quarter final stage
-
-    print("\n___Quarter final___\n")
-
-    semifinals = []
-
-    for i in range(0, 8, 2):
-
-        team_1 = quarter_final[i]
-        team_2 = quarter_final[i + 1]
-
-        print("Game: " + fifa_teams_names[team_1] + "-VS-" + fifa_teams_names[team_2])
-
-        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-            print("Winner: " + fifa_teams_names[team_1])
-            semifinals.append(team_1)
-        else:
-            print("Winner: " + fifa_teams_names[team_2])
-            semifinals.append(team_2)
-
-    print("\nWinners: ")
-    for final_team in semifinals:
-        print(fifa_teams_names[final_team])
-
-    if k in semifinals:
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # SemiFinal stage
-
-    print("\n___Semifinal___\n")
-
-    final = []
-
-    for i in range(0, 4, 2):
-
-        team_1 = semifinals[i]
-        team_2 = semifinals[i + 1]
-
-        print("Game: " + fifa_teams_names[team_1] + "-VS-" + fifa_teams_names[team_2])
-
-        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-            print("Winner: " + fifa_teams_names[team_1])
-            final.append(team_1)
-        else:
-            print("Winner: " + fifa_teams_names[team_2])
-            final.append(team_2)
-
-    print("\nWinners: " + str(final))
-    for final_team in final:
-        print(fifa_teams_names[final_team])
-
-    if k in final:
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # Final stage
-
-    print("\n___Final___\n")
-
-    team_1 = final[0]
-    team_2 = final[1]
-
-    if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-        print("Final Winner: " + fifa_teams_names[team_1])
-        winner = team_1
-    else:
-        print("Final Winner: " + fifa_teams_names[team_2])
-        winner = team_2
-
-    if k == winner:
-        fitness_score += 1
-
-    return fitness_score
-
-
-def fitness(item, k_d_matrix, k, knockout_match):
-
-    fitness_score = 1
-
-    # Group stage
-
-    eighth_finals = []
-
-    for i in range(len(item)):
-        eighth_finals.append(groupStage(item[i], k_d_matrix))
-
-    flag = is_element_in_array(k, eighth_finals)
-
-    if flag is True:
-
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # Knockout stage
-    # Eighth final
-
-    quarter_final = []
-
-    for i in knockout_match:
-        # Go through every knockout match in the fixture list, check which team
-        # wins and advance them to the quarter final stage.
-
-        team1 = i[0]
-        team2 = i[1]
-
-        team_1 = eighth_finals[team1[1] - 1][team1[0]]
-        team_2 = eighth_finals[team2[1] - 1][team2[0]]
-
-        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-
-            quarter_final.append(team_1)
-        else:
-
-            quarter_final.append(team_2)
-
-    if k in quarter_final:
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # Quarter final stage
-
-    semifinals = []
-
-    for i in range(0, 8, 2):
-
-        team_1 = quarter_final[i]
-        team_2 = quarter_final[i + 1]
-
-        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-
-            semifinals.append(team_1)
-        else:
-
-            semifinals.append(team_2)
-
-    if k in semifinals:
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # SemiFinal stage
-
-    final = []
-
-    for i in range(0, 4, 2):
-
-        team_1 = semifinals[i]
-        team_2 = semifinals[i + 1]
-
-        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-
-            final.append(team_1)
-        else:
-
-            final.append(team_2)
-
-    if k in final:
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # Final stage
-
-    team_1 = final[0]
-    team_2 = final[1]
-
-    if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-
-        winner = team_1
-    else:
-
-        winner = team_2
-
-    if k == winner:
-        fitness_score += 1
-
-    return fitness_score
-
-
 def knockout_round(previous_round_winners, k_d_matrix):
 
     next_round_winners = []
@@ -565,18 +314,18 @@ def knockout_round(previous_round_winners, k_d_matrix):
     return next_round_winners
 
 
-def gen_fitness(item, k_d_matrix, k, knockout_match, number_of_knockout_rounds):
+def fitness(item, k_d_matrix, k, knockout_match, number_of_knockout_rounds):
 
     fitness_score = 1
 
-    # Group stage
+    # Run the Group stage
 
-    eighth_finals = []
+    group_stage_winners = []
 
     for i in range(len(item)):
-        eighth_finals.append(groupStage(item[i], k_d_matrix))
+        group_stage_winners.append(groupStage(item[i], k_d_matrix))
 
-    flag = is_element_in_array(k, eighth_finals)
+    flag = is_element_in_array(k, group_stage_winners)
 
     if flag is True:
 
@@ -585,168 +334,43 @@ def gen_fitness(item, k_d_matrix, k, knockout_match, number_of_knockout_rounds):
         return fitness_score
 
     # Knockout stage
-    # Eighth final
 
-    quarter_final = []
+    first_knockout_round_winners = []
+
+    # In the first knockout round, teams play against each other based on the knockout game array,
+    # which determines which team plays against which
 
     for i in knockout_match:
-        # Go through every knockout match in the fixture list, check which team
-        # wins and advance them to the quarter final stage.
 
         team1 = i[0]
         team2 = i[1]
 
-        team_1 = eighth_finals[team1[1] - 1][team1[0]]
-        team_2 = eighth_finals[team2[1] - 1][team2[0]]
+        team_1 = group_stage_winners[team1[1] - 1][team1[0]]
+        team_2 = group_stage_winners[team2[1] - 1][team2[0]]
 
         if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
 
-            quarter_final.append(team_1)
+            first_knockout_round_winners.append(team_1)
         else:
 
-            quarter_final.append(team_2)
+            first_knockout_round_winners.append(team_2)
 
-    if k in quarter_final:
+    if k in first_knockout_round_winners:
         fitness_score += 1
     else:
         return fitness_score
 
-    for i in range (number_of_knockout_rounds - 1):
+    # Play additional knockout rounds according to the requested format (3, 4, etc.)
 
-        arr = knockout_round(quarter_final, k_d_matrix)
+    for i in range(number_of_knockout_rounds - 1):
 
-        if k in arr:
+        new_knockout_round_winners = knockout_round(first_knockout_round_winners, k_d_matrix)
+
+        if k in new_knockout_round_winners:
             fitness_score += 1
-            quarter_final = arr
+            first_knockout_round_winners = new_knockout_round_winners
         else:
             return fitness_score
-
-    return fitness_score
-
-
-def fitness_new_format(item, k_d_matrix, k, knockout_match):
-
-    fitness_score = 1
-
-    # Group stage
-
-    round_of_32 = []
-
-    for i in range(len(item)):
-        round_of_32.append(groupStage(item[i], k_d_matrix))
-
-    flag = is_element_in_array(k, round_of_32)
-
-    if flag is True:
-
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # Knockout stage - Round of 16
-
-    eighth_final = []
-
-    for i in knockout_match:
-        # Go through every knockout match in the fixture list, check which team
-        # wins and advance them to the quarter final stage.
-
-        team1 = i[0]
-        team2 = i[1]
-
-        team_1 = round_of_32[team1[1] - 1][team1[0]]
-        team_2 = round_of_32[team2[1] - 1][team2[0]]
-
-        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-
-            eighth_final.append(team_1)
-        else:
-
-            eighth_final.append(team_2)
-
-    if k in eighth_final:
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # Eighth - finals stage
-
-    quarter_final = []
-
-    for i in range(0, 16, 2):
-
-        team_1 = eighth_final[i]
-        team_2 = eighth_final[i + 1]
-
-        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-
-            quarter_final.append(team_1)
-        else:
-
-            quarter_final.append(team_2)
-
-    if k in quarter_final:
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # Quarter final stage
-
-    semifinals = []
-
-    # TODO fix any place like this in all fitness functions to len of the array
-    for i in range (0, 8, 2):
-
-        team_1 = quarter_final[i]
-        team_2 = quarter_final[i + 1]
-
-        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-
-            semifinals.append(team_1)
-        else:
-
-            semifinals.append(team_2)
-
-    if k in semifinals:
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # SemiFinal stage
-
-    final = []
-
-    for i in range(0, 4, 2):
-
-        team_1 = semifinals[i]
-        team_2 = semifinals[i + 1]
-
-        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-
-            final.append(team_1)
-        else:
-
-            final.append(team_2)
-
-    if k in final:
-        fitness_score += 1
-    else:
-        return fitness_score
-
-    # Final stage
-
-    team_1 = final[0]
-    team_2 = final[1]
-
-    if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
-
-        winner = team_1
-    else:
-
-        winner = team_2
-
-    if k == winner:
-        fitness_score += 1
 
     return fitness_score
 
@@ -864,11 +488,11 @@ def scramble_mutation(individual, mutation_rate):
         number_of_teams = len(individual[0])
 
         for i in range(number_of_groups):
-            position = random.randint(0, number_of_teams-1)
-            destination_group = random.randint(0, number_of_groups-1)
+            position = random.randint(0, number_of_teams - 1)
+            destination_group = random.randint(0, number_of_groups - 1)
 
             while i == destination_group:
-                destination_group = random.randint(0, number_of_groups-1)
+                destination_group = random.randint(0, number_of_groups - 1)
 
             # Scramble the values at the selected positions
             placeholder = individual[i][position]
@@ -909,7 +533,6 @@ def roulette_wheel_selection(population, fitness):
 
 
 def create_population(size, item_size, number_of_groups):
-
     """
     Creates a population of individuals.
 
@@ -931,7 +554,6 @@ def create_population(size, item_size, number_of_groups):
     population = []
 
     for _ in range(size):
-
         # TODO Change back the function to create_item or change create_population to get many types of
         #  create item function
         population.append(create_item(item_size, number_of_groups))
@@ -940,7 +562,6 @@ def create_population(size, item_size, number_of_groups):
 
 
 def evaluate_population_fitness(population, k_d_matrix, k, knockout_match):
-
     """
           Calculates the fitness of each individual in the population.
 
@@ -1039,7 +660,6 @@ def genetic_algorithm(population_size, item_size, number_of_groups, k_d_matrix, 
 
 
 def calculate_probability_by_fifa_scores(fifa_scores, team_1, team_2):
-
     """
     Calculate the probability of a team winning based on FIFA scores.
 
@@ -1080,7 +700,6 @@ def calculate_probability_by_fifa_scores(fifa_scores, team_1, team_2):
 
 
 def create_fifa_probability_matrix(fifa_scores):
-
     """
     Create a probability matrix based on FIFA scores.
 
@@ -1115,9 +734,8 @@ knockout_world_cup = [[(0, 1), (1, 2)], [(0, 3), (1, 4)], [(0, 5), (1, 6)], [(0,
 
 knockout_new_format_world_cup = [[(0, 1), (1, 2)], [(0, 3), (1, 4)], [(0, 5), (1, 6)], [(0, 7), (1, 8)],
                                  [(0, 2), (1, 1)], [(0, 4), (1, 3)], [(0, 6), (1, 5)], [(0, 8), (1, 7)],
-                                [(0, 9), (1, 10)], [(0, 11), (1, 12)], [(0, 13), (1, 14)], [(0, 15), (1, 16)],
+                                 [(0, 9), (1, 10)], [(0, 11), (1, 12)], [(0, 13), (1, 14)], [(0, 15), (1, 16)],
                                  [(0, 10), (1, 9)], [(0, 12), (1, 11)], [(0, 14), (1, 13)], [(0, 16), (1, 15)]]
-
 
 fifa_scores = [1388.61, 1834.21, 1792.53, 1838.45, 1840.93, 1792.43, 1682.85, 1707.22,
                1631.87, 1731.23, 1594.53, 1647.42, 1631.29, 1664.24, 1653.77, 1730.02,
@@ -1126,12 +744,8 @@ fifa_scores = [1388.61, 1834.21, 1792.53, 1838.45, 1840.93, 1792.43, 1682.85, 17
 
 # TODO mabey delete None and Chane fitness with print to final_team - 1
 fifa_teams = ['None', 'Qatar', 'Brazil', 'Belgium', 'France', 'Argentina', 'England', 'Spain', 'Portugal',
-              'Mexico','Netherlands', 'Denmark', 'Germany', 'Uruguay', 'Switzerland', 'United States', 'Croatia',
+              'Mexico', 'Netherlands', 'Denmark', 'Germany', 'Uruguay', 'Switzerland', 'United States', 'Croatia',
               'Senegal', 'Iran', 'Japan', 'Morocco', 'Serbia', 'Poland', 'South Korea', 'Tunisia',
               'Cameroon', 'Canada', 'Ecuador', 'Saudi Arabia', 'Ghana', 'Wales', 'Costa Rica', 'Australia'
+
               ]
-
-
-
-
-
