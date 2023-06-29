@@ -34,8 +34,6 @@ def create_item(size, number_of_groups):
 
 def create_item_by_tiers():
 
-    # TODO שקול לאפטם את הפונקציה
-
     """
     Generate team arrangements based on tiers.
 
@@ -69,12 +67,15 @@ def create_item_by_tiers():
         team_1 = random.choice(tier_1)
         tier_1 = np.delete(tier_1, np.argwhere(tier_1 == team_1))
         group.append(team_1)
+
         team_2 = random.choice(tier_2)
         tier_2 = np.delete(tier_2, np.argwhere(tier_2 == team_2))
         group.append(team_2)
+
         team_3 = random.choice(tier_3)
         tier_3 = np.delete(tier_3, np.argwhere(tier_3 == team_3))
         group.append(team_3)
+
         team_4 = random.choice(tier_4)
         tier_4 = np.delete(tier_4, np.argwhere(tier_4 == team_4))
         group.append(team_4)
@@ -440,6 +441,7 @@ def fitness_with_prints(item, k_d_matrix, k, knockout_match, fifa_teams_names):
 
 
 def fitness(item, k_d_matrix, k, knockout_match):
+
     fitness_score = 1
 
     # Group stage
@@ -540,6 +542,84 @@ def fitness(item, k_d_matrix, k, knockout_match):
 
     if k == winner:
         fitness_score += 1
+
+    return fitness_score
+
+
+def knockout_round(previous_round_winners, k_d_matrix):
+
+    next_round_winners = []
+
+    for i in range(0, len(previous_round_winners), 2):
+
+        team_1 = previous_round_winners[i]
+        team_2 = previous_round_winners[i + 1]
+
+        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
+
+            next_round_winners.append(team_1)
+        else:
+
+            next_round_winners.append(team_2)
+
+    return next_round_winners
+
+
+def gen_fitness(item, k_d_matrix, k, knockout_match, number_of_knockout_rounds):
+
+    fitness_score = 1
+
+    # Group stage
+
+    eighth_finals = []
+
+    for i in range(len(item)):
+        eighth_finals.append(groupStage(item[i], k_d_matrix))
+
+    flag = is_element_in_array(k, eighth_finals)
+
+    if flag is True:
+
+        fitness_score += 1
+    else:
+        return fitness_score
+
+    # Knockout stage
+    # Eighth final
+
+    quarter_final = []
+
+    for i in knockout_match:
+        # Go through every knockout match in the fixture list, check which team
+        # wins and advance them to the quarter final stage.
+
+        team1 = i[0]
+        team2 = i[1]
+
+        team_1 = eighth_finals[team1[1] - 1][team1[0]]
+        team_2 = eighth_finals[team2[1] - 1][team2[0]]
+
+        if k_d_matrix[team_1 - 1][team_2 - 1] == 1:
+
+            quarter_final.append(team_1)
+        else:
+
+            quarter_final.append(team_2)
+
+    if k in quarter_final:
+        fitness_score += 1
+    else:
+        return fitness_score
+
+    for i in range (number_of_knockout_rounds - 1):
+
+        arr = knockout_round(quarter_final, k_d_matrix)
+
+        if k in arr:
+            fitness_score += 1
+            quarter_final = arr
+        else:
+            return fitness_score
 
     return fitness_score
 
@@ -1050,7 +1130,6 @@ fifa_teams = ['None', 'Qatar', 'Brazil', 'Belgium', 'France', 'Argentina', 'Engl
               'Senegal', 'Iran', 'Japan', 'Morocco', 'Serbia', 'Poland', 'South Korea', 'Tunisia',
               'Cameroon', 'Canada', 'Ecuador', 'Saudi Arabia', 'Ghana', 'Wales', 'Costa Rica', 'Australia'
               ]
-
 
 
 
