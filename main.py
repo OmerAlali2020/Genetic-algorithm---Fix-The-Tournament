@@ -185,11 +185,6 @@ def create_fifa_knockout_decision_matrix(p_matrix):
     list: a matrix as a list of size 'size'. A win is 1, a loss is 0. The diagonal is
     coded to -1.
 
-
-    Example:
-        >>> create_fifa_knockout_decision_matrix(m)
-        [[-1, 0],
-        [1, -1]]
     """
 
     size = len(p_matrix)
@@ -240,9 +235,6 @@ def groupStage(group, k_d_matrix):
     Returns:
     list: The two teams that advanced to the next stage.
 
-    Example:
-    >>> groupStage(group, matrix)
-    (1,17)
     """
 
     # run the group stage so each team plays against each team in its stage
@@ -297,6 +289,19 @@ def is_element_in_array(element, array):
 
 def knockout_round(previous_round_winners, k_d_matrix):
 
+    """
+
+    Play one knockout round using the winners array from the previous round
+
+    Args:
+    previous_round_winners (list): Thw winners array from the previous round
+    k_d_matrix (list): The result matrix of 1:1 matches between the teams (does team i win/lose to team j)
+
+    Returns:
+    list: The winners array from this round
+
+    """
+
     next_round_winners = []
 
     for i in range(0, len(previous_round_winners), 2):
@@ -315,6 +320,23 @@ def knockout_round(previous_round_winners, k_d_matrix):
 
 
 def fitness(item, k_d_matrix, k, knockout_match, number_of_knockout_rounds):
+
+    """
+
+    Calculate the fitness score of the item. The function "plays" an entire World Cup.
+    Every stage the selected group move forward, the  fitness score increases by 1
+
+    Args:
+    item (list): The selected item (possible arrangement of the group stage)
+    k_d_matrix (list): the result matrix of 1:1 matches between the teams (does team i win/lose to team j)
+    k (int): the individual we are interested in.
+    knockout_match (list): the transition function from the house stage to the knockout stage
+    number_of_knockout_rounds (int): The number of knockout rounds in the game
+
+    Returns:
+    int: fitness score between 1 - number_of_knockout_rounds + 2
+
+    """
 
     fitness_score = 1
 
