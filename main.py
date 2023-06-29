@@ -11,7 +11,7 @@ def create_item(size, number_of_groups):
         number_of_groups (int): The number of groups to divide the teams into.
 
     Returns:
-        np.ndarray: An array of size 'size' divided into 'number_of_groups' subarrays of size 'size // number_of_groups'.
+        np.ndarray: An array of size 'size' divided into 'number_of_groups' subarrays of size 'size // number_of_groups'
 
     Example:
         >>> create_item(32, 8)
@@ -241,7 +241,7 @@ def groupStage(group, k_d_matrix):
     list: The two teams that advanced to the next stage.
 
     Example:
-    >>> groupStage(group2, m)
+    >>> groupStage(group, matrix)
     (1,17)
     """
 
@@ -561,7 +561,7 @@ def create_population(size, item_size, number_of_groups):
     return population
 
 
-def evaluate_population_fitness(population, k_d_matrix, k, knockout_match):
+def evaluate_population_fitness(population, k_d_matrix, k, knockout_match, number_of_knockout_rounds):
     """
           Calculates the fitness of each individual in the population.
 
@@ -570,6 +570,7 @@ def evaluate_population_fitness(population, k_d_matrix, k, knockout_match):
               k_d_matrix (list): the result matrix of 1:1 matches between the teams (does team i win/lose to team j)
               k (int): the individual we are interested in in.
               knockout_match (list): the transition function from the house stage to the knockout stage
+              number_of_knockout_rounds (int): The number of knockout rounds in the game format
 
           Returns:
               List: A list of fitness values corresponding to each individual in the population.
@@ -579,8 +580,7 @@ def evaluate_population_fitness(population, k_d_matrix, k, knockout_match):
     fitness_array = []
 
     for item in population:
-        # TODO change back fitness_new_format to fitness
-        fitness_array.append(fitness(item, k_d_matrix, k, knockout_match))
+        fitness_array.append(fitness(item, k_d_matrix, k, knockout_match, number_of_knockout_rounds))
 
     return fitness_array
 
@@ -602,7 +602,7 @@ def genetic_algorithm(population_size, item_size, number_of_groups, k_d_matrix, 
             knockout_rounds (int): The number of knockout rounds in the game
 
         Returns:
-            tuple: A tuple containing the best individual found and its corresponding score.
+            tuple: A tuple containing the best individual found [0] and its corresponding score [1]
 
         """
 
@@ -612,7 +612,8 @@ def genetic_algorithm(population_size, item_size, number_of_groups, k_d_matrix, 
     # Initialize the population
 
     population = create_population(population_size, item_size, number_of_groups)
-    population_fitness = evaluate_population_fitness(population, k_d_matrix, selected_individual, knockout_match_array)
+    population_fitness = evaluate_population_fitness(population, k_d_matrix, selected_individual, knockout_match_array,
+                                                     knockout_rounds)
 
     # Do until the selected individual has won the tournament or until the maximum amount of generations
 
@@ -650,7 +651,7 @@ def genetic_algorithm(population_size, item_size, number_of_groups, k_d_matrix, 
 
         population = new_population
         population_fitness = evaluate_population_fitness(population, k_d_matrix, selected_individual,
-                                                         knockout_match_array)
+                                                         knockout_match_array, knockout_rounds)
 
     best_score = max(population_fitness)
     best_individual_index = population_fitness.index(best_score)
