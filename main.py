@@ -544,12 +544,12 @@ def roulette_wheel_selection(population, fitness):
     # Compute the total fitness of the population
     population_fitness = sum(fitness)
 
-    # Compute the probability for each chromosome
-    chromosome_probabilities = [i / population_fitness for i in fitness]
+    # Compute the probability for each item
+    items_probabilities = [i / population_fitness for i in fitness]
 
-    # Select one chromosome based on the computed probabilities
+    # Select one item based on the computed probabilities
     population_index = list(range(len(population)))
-    choice = np.random.choice(population_index, p=chromosome_probabilities)
+    choice = np.random.choice(population_index, p=items_probabilities)
 
     return population[choice]
 
@@ -576,8 +576,7 @@ def create_population(size, item_size, number_of_groups):
     population = []
 
     for _ in range(size):
-        # TODO Change back the function to create_item or change create_population to get many types of
-        #  create item function
+
         population.append(create_item(item_size, number_of_groups))
 
     return population
@@ -624,7 +623,7 @@ def genetic_algorithm(population_size, item_size, number_of_groups, k_d_matrix, 
             knockout_rounds (int): The number of knockout rounds in the game
 
         Returns:
-            tuple: A tuple containing the best individual found [0] and its corresponding score [1]
+            tuple: A tuple containing the best individual found [0] and its fitness score [1]
 
         """
 
@@ -646,7 +645,7 @@ def genetic_algorithm(population_size, item_size, number_of_groups, k_d_matrix, 
         if max(population_fitness) == max_score:
             # The individual we want won the tournament
 
-            best_score = max(population_fitness)
+            best_score = max_score
             best_individual_index = population_fitness.index(best_score)
             best_individual = population[best_individual_index]
 
@@ -765,10 +764,9 @@ fifa_scores = [1388.61, 1834.21, 1792.53, 1838.45, 1840.93, 1792.43, 1682.85, 17
                1613.21, 1553.23, 1588.59, 1677.79, 1541.52, 1553.76, 1536.01, 1535.76,
                1470.21, 1442.66, 1478.13, 1421.46, 1396.01, 1538.95, 1491.12, 1532.79]
 
-# TODO mabey delete None and Chane fitness with print to final_team - 1
 fifa_teams = ['None', 'Qatar', 'Brazil', 'Belgium', 'France', 'Argentina', 'England', 'Spain', 'Portugal',
               'Mexico', 'Netherlands', 'Denmark', 'Germany', 'Uruguay', 'Switzerland', 'United States', 'Croatia',
               'Senegal', 'Iran', 'Japan', 'Morocco', 'Serbia', 'Poland', 'South Korea', 'Tunisia',
-              'Cameroon', 'Canada', 'Ecuador', 'Saudi Arabia', 'Ghana', 'Wales', 'Costa Rica', 'Australia'
+              'Cameroon', 'Canada', 'Ecuador', 'Saudi Arabia', 'Ghana', 'Wales', 'Costa Rica', 'Australia']
 
-              ]
+
